@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path/path.dart' as path;
+import 'package:flutter/foundation.dart';
 
 import 'features/tasks/data/datasources/theme_local_data_source.dart';
 import 'features/tasks/data/repositories/theme_repository_impl.dart';
@@ -16,8 +19,14 @@ final GetIt sl = GetIt.instance;
 Future<void> initializeDependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  final appDocumentDir = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDir.path);
+  if (kIsWeb) {
+    // For web, use IndexedDB as the storage backend
+    await Hive.initFlutter();
+  } else {
+    // For mobile/desktop, use the local filesystem
+    final appDocumentDirectory = await getApplicationDocumentsDirectory();
+    Hive.init(path.join(appDocumentDirectory.path, 'hive'));
+  }
   final box = await Hive.openBox('theme_box');
   // Data Sources
   sl.registerLazySingleton<ThemeLocalDataSource>(
