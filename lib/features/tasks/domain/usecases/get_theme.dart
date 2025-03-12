@@ -8,6 +8,10 @@ class GetThemeUsecase {
     return sl<ThemeRepository>().getPrimaryColor();
   }
 
+  Color? getTextColor() {
+    return sl<ThemeRepository>().getTextColor();
+  }
+
   bool? getThemeMode() {
     return sl<ThemeRepository>().getThemeMode();
   }
