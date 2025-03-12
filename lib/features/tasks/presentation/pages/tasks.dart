@@ -13,16 +13,21 @@ class _TasksState extends State<Tasks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: drawer(context),
+      // to change the color of the leading or the drawer icon to white
       appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        title: const Text('Tasks'),
+        iconTheme: IconThemeData(
+          color: Colors.white, // change the color of the drawer icon to white
+        ),
+        title: Text(
+          'Tasks',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+      drawer: drawer(context),
 
-        // leading
-      ),
       body: Container(
-        color: Colors.white,
-      ),
+          // color: Colors.white,
+          ),
     );
   }
 }
