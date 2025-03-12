@@ -4,9 +4,18 @@ import 'package:flutter/material.dart';
 
 import '../../../../injection_container.dart';
 
-class UpdateThemeUsecase implements Usecase<void, Color> {
+class UpdateThemeUsecase implements Usecase<void, ColorParams> {
   @override
-  Future<void> call({Color? params}) async {
-    return await sl<ThemeRepository>().updatePrimaryColor(params!);
+  Future<void> call({ColorParams? params}) async {
+    return await sl<ThemeRepository>()
+        .updatePrimaryColor(params!.primaryColor, params.textColor);
   }
+}
+
+// parameter containing two color
+class ColorParams {
+  final Color primaryColor;
+  final Color textColor;
+
+  ColorParams({required this.primaryColor, required this.textColor});
 }
