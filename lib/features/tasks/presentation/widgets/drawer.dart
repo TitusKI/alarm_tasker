@@ -8,6 +8,8 @@ import '../../../theme/presentation/cubit/theme_cubit.dart';
 
 Widget drawer(BuildContext context) {
   return Drawer(
+    clipBehavior: Clip.none,
+    width: 280.w,
     child: ListView(
       children: <Widget>[
         SizedBox(
@@ -18,20 +20,18 @@ Widget drawer(BuildContext context) {
               color: sl<ThemeCubit>().state.primaryColor,
             ),
             child: Text(
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.rtl,
               'Tasks',
-              style: TextStyle(
-                // color: Colors.white,
-                fontSize: 24,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
         ),
         ListTile(
-          onTap: () => {
-// move to task screen using go router
-            context.go('/'),
-
-            showColorPicker(context),
+          onTap: () {
+            Navigator.of(context).pop(); // Close the drawer
+            // context.go('/'); // Move to task screen using go router
+            showColorPicker(context);
           },
           leading: Icon(
             Icons.add_circle,
