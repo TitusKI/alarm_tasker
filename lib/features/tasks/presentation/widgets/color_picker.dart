@@ -27,6 +27,10 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = ThemeData.estimateBrightnessForColor(selectedColor);
+    final textColor =
+        brightness == Brightness.light ? Colors.black : Colors.white;
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: SingleChildScrollView(
@@ -39,18 +43,18 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('List Name',
+                  Text('List Name',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: textColor,
                           fontSize: 18)),
-                  const TextField(
+                  TextField(
                     decoration: InputDecoration(
                       hintText: "Let's give it a name...",
-                      hintStyle: TextStyle(color: Colors.white70),
+                      hintStyle: TextStyle(color: textColor),
                       border: InputBorder.none,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: textColor),
                   ),
                 ],
               ),
