@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../injection_container.dart';
-import '../../../theme/data/datasources/theme_local_data_source.dart';
+import '../datasources/theme_local_data_source.dart';
 import '../../domain/repositories/theme_repository.dart';
 
 class ThemeRepositoryImpl implements ThemeRepository {

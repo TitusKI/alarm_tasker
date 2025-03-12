@@ -1,10 +1,10 @@
-import 'package:alarm_tasker/features/tasks/domain/usecases/toggle_theme_mode.dart';
+import 'package:alarm_tasker/features/theme/domain/usecases/toggle_theme_mode.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../injection_container.dart';
-import '../../../tasks/domain/usecases/get_theme.dart';
-import '../../../tasks/domain/usecases/update_theme.dart';
+import '../../domain/usecases/get_theme.dart';
+import '../../domain/usecases/update_theme.dart';
 import 'theme_state.dart';
 
 class ThemeCubit extends Cubit<ThemeState> {
