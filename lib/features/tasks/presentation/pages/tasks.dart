@@ -15,12 +15,9 @@ class _TasksState extends State<Tasks> {
     return Scaffold(
       // to change the color of the leading or the drawer icon to white
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white, // change the color of the drawer icon to white
-        ),
         title: Text(
           'Tasks',
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
       drawer: drawer(context),
