@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../injection_container.dart';
-import '../datasources/theme_local_data_source.dart';
+import '../../../theme/data/datasources/theme_local_data_source.dart';
 import '../../domain/repositories/theme_repository.dart';
 
 class ThemeRepositoryImpl implements ThemeRepository {
   final ThemeLocalDataSource localDataSource = sl<ThemeLocalDataSource>();
 
   @override
-  Future<void> updatePrimaryColor(Color color) async {
-    await localDataSource.cachePrimaryColor(color);
+  Future<void> updatePrimaryColor(Color primaryColor, Color textColor) async {
+    await localDataSource.cachePrimaryColor(primaryColor);
+    await localDataSource.cacheTextColor(textColor);
   }
 
   @override
@@ -19,6 +20,11 @@ class ThemeRepositoryImpl implements ThemeRepository {
   @override
   Color? getPrimaryColor() {
     return localDataSource.getPrimaryColor();
+  }
+
+  @override
+  Color? getTextColor() {
+    return localDataSource.getTextColor();
   }
 
   @override
