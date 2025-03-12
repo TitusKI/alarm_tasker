@@ -1,3 +1,4 @@
+import 'package:alarm_tasker/config/theme/theme_widgets/appbar_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,9 +11,8 @@ ThemeData getAppTheme(
   return ThemeData(
     brightness: isDarkMode ? Brightness.dark : Brightness.light,
     primaryColor: primaryColor,
-    appBarTheme: AppBarTheme(
-      backgroundColor: primaryColor,
-    ),
+    appBarTheme: TAppBarTheme.lightAppBarTheme(primaryColor, textColor),
+
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: primaryColor,
     ),
