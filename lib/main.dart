@@ -4,6 +4,7 @@ import 'package:alarm_tasker/features/theme/presentation/cubit/theme_state.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive/hive.dart';
 
 import 'config/theme/app_theme.dart';
 import 'features/theme/presentation/cubit/theme_cubit.dart';
@@ -14,8 +15,19 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // @override
+  // void dispose() {
+  //   Hive.close();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +42,10 @@ class MyApp extends StatelessWidget {
             return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
                 routerConfig: Routes().router,
-                theme: getAppTheme(state.primaryColor, state.isDarkMode));
+                theme: getAppTheme(
+                    primaryColor: state.primaryColor,
+                    isDarkMode: state.isDarkMode,
+                    textColor: state.textColor));
           },
         ),
       ),
