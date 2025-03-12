@@ -11,15 +11,23 @@ class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit()
       : super(
           ThemeState(
-            primaryColor:
-                sl<GetThemeUsecase>().getPrimaryColor() ?? Colors.blue,
-            isDarkMode: sl<GetThemeUsecase>().getThemeMode() ?? false,
-          ),
+              primaryColor:
+                  sl<GetThemeUsecase>().getPrimaryColor() ?? Colors.blue,
+              isDarkMode: sl<GetThemeUsecase>().getThemeMode() ?? false,
+              textColor: sl<GetThemeUsecase>().getTextColor() ?? Colors.white),
         );
 
   Future<void> updatePrimaryColor(Color newColor) async {
-    await sl<UpdateThemeUsecase>().call(params: newColor);
-    emit(state.copyWith(primaryColor: newColor));
+    final brightness = ThemeData.estimateBrightnessForColor(newColor);
+    final textColor =
+        brightness == Brightness.light ? Colors.black : Colors.white;
+
+    await sl<UpdateThemeUsecase>().call(
+        params: ColorParams(
+      primaryColor: newColor,
+      textColor: textColor,
+    ));
+    emit(state.copyWith(primaryColor: newColor, textColor: textColor));
   }
 
   Future<void> toggleDarkMode() async {
