@@ -1,6 +1,10 @@
 import 'package:alarm_tasker/features/tasks/presentation/widgets/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../injection_container.dart';
+import '../../../theme/presentation/cubit/theme_cubit.dart';
 
 Widget drawer(BuildContext context) {
   return Drawer(
@@ -11,22 +15,28 @@ Widget drawer(BuildContext context) {
           child: DrawerHeader(
             margin: EdgeInsets.zero,
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: sl<ThemeCubit>().state.primaryColor,
             ),
             child: Text(
               'Tasks',
               style: TextStyle(
-                color: Colors.white,
+                // color: Colors.white,
                 fontSize: 24,
               ),
             ),
           ),
         ),
         ListTile(
-          onTap: () => showColorPicker(context),
+          onTap: () => {
+// move to task screen using go router
+            context.go('/'),
+
+            showColorPicker(context),
+          },
           leading: Icon(
             Icons.add_circle,
           ),
+          horizontalTitleGap: 35.w,
           title: Text('New List'),
         ),
         Divider(
