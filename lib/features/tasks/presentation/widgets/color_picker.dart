@@ -32,6 +32,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
         brightness == Brightness.light ? Colors.black : Colors.white;
 
     return AlertDialog(
+      clipBehavior: Clip.none,
       contentPadding: EdgeInsets.zero,
       content: SingleChildScrollView(
         child: Column(
@@ -39,22 +40,27 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
           children: [
             Container(
               color: selectedColor,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('List Name',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          fontSize: 18)),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: textColor,
+                          )),
                   TextField(
                     decoration: InputDecoration(
                       hintText: "Let's give it a name...",
                       hintStyle: TextStyle(color: textColor),
-                      border: InputBorder.none,
+                      focusColor: textColor.withAlpha((0.5 * 255).toInt()),
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(color: textColor),
+                      ),
                     ),
-                    style: TextStyle(color: textColor),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall
+                        ?.copyWith(color: textColor),
                   ),
                 ],
               ),
@@ -71,7 +77,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
