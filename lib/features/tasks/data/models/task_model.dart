@@ -1,23 +1,25 @@
-import 'package:hive/hive.dart';
-
-import 'subtask_model.dart';
-
-part 'task_model.g.dart';
-
-@HiveType(typeId: 0)
-class Task {
-  @HiveField(0)
+class TaskModel {
   final String id;
-
-  @HiveField(1)
   final String title;
 
-  @HiveField(2)
-  final List<SubTask> subTasks;
-
-  Task({
+  TaskModel({
     required this.id,
     required this.title,
-    this.subTasks = const [],
   });
+
+  // Convert a TaskModel to a Map (for SQLite)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+    };
+  }
+
+  // Convert a Map to a TaskModel (from SQLite)
+  factory TaskModel.fromMap(Map<String, dynamic> map) {
+    return TaskModel(
+      id: map['id'],
+      title: map['title'],
+    );
+  }
 }

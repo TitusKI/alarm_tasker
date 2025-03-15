@@ -1,21 +1,49 @@
-import 'package:hive/hive.dart';
-
-part 'subtask_model.g.dart'; // Generated file
-
-@HiveType(typeId: 1)
-class SubTask {
-  @HiveField(0)
+class SubTaskModel {
   final String id;
-
-  @HiveField(1)
   final String title;
-
-  @HiveField(2)
+  final DateTime? dueDate;
+  final String? priority;
+  final String? imagePath;
+  final String? description;
   final bool isCompleted;
+  final String subTaskTitleId; // Foreign key to SubTaskTitle
 
-  SubTask({
+  SubTaskModel({
     required this.id,
     required this.title,
+    this.dueDate,
+    this.priority,
+    this.imagePath,
+    this.description,
     this.isCompleted = false,
+    required this.subTaskTitleId,
   });
+
+  // Convert to Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'dueDate': dueDate?.toIso8601String(),
+      'priority': priority,
+      'imagePath': imagePath,
+      'description': description,
+      'isCompleted': isCompleted ? 1 : 0,
+      'subTaskTitleId': subTaskTitleId,
+    };
+  }
+
+  // Convert from Map
+  factory SubTaskModel.fromMap(Map<String, dynamic> map) {
+    return SubTaskModel(
+      id: map['id'],
+      title: map['title'],
+      dueDate: DateTime.parse(map['dueDate']),
+      priority: map['priority'],
+      imagePath: map['imagePath'],
+      description: map['description'],
+      isCompleted: map['isCompleted'] == 1,
+      subTaskTitleId: map['subTaskTitleId'],
+    );
+  }
 }
