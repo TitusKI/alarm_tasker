@@ -1,8 +1,16 @@
+import 'package:alarm_tasker/features/tasks/domain/entities/sub_task_title.dart';
+import 'package:alarm_tasker/features/tasks/domain/entities/task.dart';
 import 'package:alarm_tasker/features/theme/presentation/cubit/theme_cubit.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/resources/generic_state.dart';
+import '../cubit/subtask_titles_cubit.dart';
+import '../cubit/tasks_cubit.dart';
+import '../pages/tasks.dart';
 
 class ColorPickerDialog extends StatefulWidget {
   const ColorPickerDialog({super.key});
@@ -13,6 +21,7 @@ class ColorPickerDialog extends StatefulWidget {
 
 class _ColorPickerDialogState extends State<ColorPickerDialog> {
   late Color selectedColor;
+  final TextEditingController _titleController = TextEditingController();
 
   @override
   void initState() {
@@ -23,6 +32,66 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
 
   void changeColor(Color color) {
     setState(() => selectedColor = color);
+  }
+
+  Future<void> _saveTask() async {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task name cannot be empty')),
+        );
+      }
+      return;
+    }
+
+    final taskId = UniqueKey().toString();
+    final subTaskId = UniqueKey().toString();
+    final subTaskTitleCubit = context.read<SubTaskTitleCubit>();
+
+    try {
+      if (!mounted) return;
+
+      // Add Task
+      await context.read<TaskCubit>().addTask(
+            TaskEntity(id: taskId, title: title),
+          );
+      print("Task added successfully");
+
+      // Add SubTaskTitle
+      await subTaskTitleCubit.addSubTaskTitle(
+        SubTaskTitleEntity(id: subTaskId, title: title, taskId: taskId),
+      );
+      print("SubTaskTitle added successfully");
+
+      // Ensure the widget is still mounted before navigation
+      if (mounted) {
+        context.read<ThemeCubit>().updatePrimaryColor(selectedColor);
+
+        print("Before navigation, taskId: $taskId");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return Tasks(taskId: taskId);
+          }),
+        );
+      } else {
+        print("Widget is no longer mounted, skipping navigation");
+      }
+    } catch (e) {
+      print("Error saving task: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save task')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,7 +109,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
           children: [
             Container(
               color: selectedColor,
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -49,10 +118,10 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                             color: textColor,
                           )),
                   TextField(
+                    controller: _titleController,
                     decoration: InputDecoration(
                       hintText: "Let's give it a name...",
-                      hintStyle: TextStyle(color: textColor),
-                      focusColor: textColor.withAlpha((0.5 * 255).toInt()),
+                      hintStyle: TextStyle(color: textColor.withOpacity(0.7)),
                       border: UnderlineInputBorder(
                         borderSide: BorderSide(color: textColor),
                       ),
@@ -85,12 +154,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                         style: TextStyle(color: Colors.orangeAccent)),
                   ),
                   TextButton(
-                    onPressed: () {
-                      context
-                          .read<ThemeCubit>()
-                          .updatePrimaryColor(selectedColor);
-                      Navigator.pop(context);
-                    },
+                    onPressed: _saveTask,
                     child: const Text('SAVE',
                         style: TextStyle(color: Colors.orangeAccent)),
                   ),
