@@ -8,10 +8,10 @@ import '../../domain/entities/sub_task.dart';
 class SubTaskCubit extends Cubit<GenericState<List<SubTaskEntity>>> {
   SubTaskCubit() : super(GenericState.initial());
 
-  Future<void> loadSubTasks(String taskId) async {
+  Future<void> loadSubTasks(String subTaskId) async {
     emit(GenericState.loading());
     try {
-      final subTasks = await sl<GetSubTasksUsecase>().call(params: taskId);
+      final subTasks = await sl<GetSubTasksUsecase>().call(params: subTaskId);
       emit(GenericState.success(subTasks));
     } catch (e) {
       emit(GenericState.failure(e.toString()));
