@@ -1,13 +1,13 @@
-import 'sub_task.dart';
+import 'sub_task_title.dart';
 
 class TaskEntity {
   final String id;
   final String title;
-  final List<SubTaskEntity> subTasks;
+  final List<SubTaskTitleEntity> subTaskTitles;
 
   TaskEntity({
     required this.id,
     required this.title,
-    this.subTasks = const [],
+    this.subTaskTitles = const [],
   });
 }
