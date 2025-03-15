@@ -40,8 +40,8 @@ List<TaskWithSubTasks> mapResultToModel(List<Map<String, dynamic>> result) {
         final subTask = SubTask(
           id: subTaskId,
           title: row['subTaskName'] as String,
-          dueDate: row['dueDate'] as String,
-          priority: row['priority'] as String,
+          dueDate: row['dueDate'] as String?,
+          priority: row['priority'] as String?,
           imagePath: row['imagePath'] as String?,
           description: row['description'] as String?,
           isCompleted: (row['isCompleted'] as int) == 1,
