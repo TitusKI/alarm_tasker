@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'features/tasks/data/datasources/initialize_db.dart';
 import 'features/tasks/data/datasources/sub_task_local_data_source.dart';
@@ -50,7 +51,7 @@ Future<void> initializeDependencies() async {
   // Open the box
   final box = await Hive.openBox('theme_box');
   final constBox = await Hive.openBox('constant_box');
-  sl.registerSingleton(database);
+  sl.registerSingleton<Database>(database);
   // Data Sources
   sl.registerLazySingleton<ThemeLocalDataSource>(
       () => ThemeLocalDataSourceImpl(box));
