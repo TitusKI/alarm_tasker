@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive/hive.dart';
 
 import 'config/theme/app_theme.dart';
+import 'core/util/get_bloc_providers.dart';
 import 'features/theme/presentation/cubit/theme_cubit.dart';
 import 'injection_container.dart';
 
@@ -31,8 +32,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ThemeCubit>(),
+    return MultiBlocProvider(
+      providers: getBlocProviders(),
       child: ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,
