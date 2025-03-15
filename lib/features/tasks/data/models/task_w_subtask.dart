@@ -25,8 +25,8 @@ class SubTaskTitleWithSubtasks {
 class SubTask {
   final String id;
   final String title;
-  final String dueDate;
-  final String priority;
+  final String? dueDate;
+  final String? priority;
   final String? imagePath;
   final String? description;
   final bool isCompleted;
@@ -34,8 +34,8 @@ class SubTask {
   SubTask({
     required this.id,
     required this.title,
-    required this.dueDate,
-    required this.priority,
+    this.dueDate,
+    this.priority,
     this.imagePath,
     this.description,
     required this.isCompleted,
