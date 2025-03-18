@@ -23,8 +23,13 @@ class SubTaskCubit extends Cubit<GenericState<List<SubTaskEntity>>> {
       print("Adding subtask....");
       await sl<AddSubTaskUsecase>().call(params: subTask);
       print("successfully added subtask");
+      // Get the existing subtasks for the specific SubTaskTitle
       final updatedList = List<SubTaskEntity>.from(state.data ?? [])
-        ..add(subTask);
+          .where((s) => s.subTaskTitleId != subTask.subTaskTitleId)
+          .toList();
+
+      updatedList.add(subTask);
+
       print("updatedList: $updatedList");
       emit(GenericState.success(updatedList));
     } catch (e) {

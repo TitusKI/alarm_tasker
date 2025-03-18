@@ -9,6 +9,7 @@ import '../../data/datasources/db_constant.dart';
 import '../../domain/entities/sub_task_title.dart';
 import '../cubit/subtask_titles_cubit.dart';
 import '../cubit/tasks_w_subtask_cubit.dart';
+import '../pages/tasks.dart';
 
 class SubListAddDialog extends StatefulWidget {
   const SubListAddDialog({super.key});
@@ -106,10 +107,11 @@ class _SubListAddDialogState extends State<SubListAddDialog> {
                         ),
                         SizedBox(width: 8.0.h),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             final subTaskTitleId = UniqueKey().toString();
 
-                            context
+                            // Add subtask title and wait for it to complete
+                            await context
                                 .read<SubTaskTitleCubit>()
                                 .addSubTaskTitle(
                                   SubTaskTitleEntity(
@@ -117,16 +119,19 @@ class _SubListAddDialogState extends State<SubListAddDialog> {
                                     taskId: taskId!,
                                     id: subTaskTitleId,
                                   ),
-                                )
-                                .then((_) {
-                              if (mounted) {
-                                Navigator.of(context).pop();
-                                context.go("/tasks");
-                                context
-                                    .read<TasksWSubtaskCubit>()
-                                    .loadTasksWithSubTasks(id: taskId);
-                              }
-                            });
+                                );
+
+                            if (mounted) {
+                              // await context
+                              //     .read<TasksWSubtaskCubit>()
+                              //     .loadTasksWithSubTasks(id: taskId);
+
+                              // Navigate after state is updated
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => Tasks(taskId: taskId)));
+                              // Close the dialog
+                              // Navigator.of(context).pop();
+                            }
                           },
                           child: Text(
                             'SAVE',
@@ -135,7 +140,7 @@ class _SubListAddDialogState extends State<SubListAddDialog> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),

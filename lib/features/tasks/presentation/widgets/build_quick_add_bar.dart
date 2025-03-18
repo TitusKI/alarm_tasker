@@ -75,6 +75,7 @@ class QuickAddBar extends StatelessWidget {
                               context
                                   .read<TasksWSubtaskCubit>()
                                   .loadTasksWithSubTasks(id: taskId)
+                                  .asStream(),
                               // Navigator.of(context).push(MaterialPageRoute(
                               //     builder: (context) => Tasks()))
                             });

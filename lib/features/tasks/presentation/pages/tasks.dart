@@ -132,25 +132,31 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
         tabController!.length != task.subTaskTitles.length) {
       _initTabController(task.subTaskTitles);
     }
+
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight),
       child: Row(
         children: [
           Expanded(
-            child: TabBar(
-              tabAlignment: TabAlignment.start,
-              controller: tabController,
-              isScrollable: true,
-              indicatorColor: Theme.of(context).colorScheme.secondary,
-              labelColor: Theme.of(context).colorScheme.onPrimary,
-              unselectedLabelColor: Colors.white,
-              tabs: task.subTaskTitles
-                  .map((title) => Tab(
-                          child: Text(
-                        title.title,
-                        style: textTheme.bodyLarge,
-                      )))
-                  .toList(),
+            child: BlocBuilder<SubTaskTitleCubit,
+                GenericState<List<SubTaskTitleEntity>>>(
+              builder: (context, state) {
+                return TabBar(
+                  tabAlignment: TabAlignment.start,
+                  controller: tabController,
+                  isScrollable: true,
+                  indicatorColor: Theme.of(context).colorScheme.secondary,
+                  labelColor: Theme.of(context).colorScheme.onPrimary,
+                  unselectedLabelColor: Colors.white,
+                  tabs: task.subTaskTitles
+                      .map((title) => Tab(
+                              child: Text(
+                            title.title,
+                            style: textTheme.bodyLarge,
+                          )))
+                      .toList(),
+                );
+              },
             ),
           ),
           IconButton(
