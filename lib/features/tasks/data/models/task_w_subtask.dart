@@ -52,4 +52,24 @@ class SubTask {
       isCompleted: map['isCompleted'] == 1,
     );
   }
+  // copyWith Method for updating subTask
+  SubTask copyWith({
+    String? id,
+    String? title,
+    String? dueDate,
+    String? priority,
+    String? imagePath,
+    String? description,
+    bool? isCompleted,
+  }) {
+    return SubTask(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      dueDate: dueDate ?? this.dueDate,
+      priority: priority ?? this.priority,
+      imagePath: imagePath ?? this.imagePath,
+      description: description ?? this.description,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
 }

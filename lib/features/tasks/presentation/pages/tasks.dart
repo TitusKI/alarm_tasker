@@ -15,6 +15,7 @@ import '../cubit/subtasks_cubit.dart';
 import '../widgets/build_quick_add_bar.dart';
 import '../widgets/drawer.dart';
 import '../widgets/sublist_dialog.dart';
+import '../widgets/subtask_widget.dart';
 
 class Tasks extends StatefulWidget {
   final String? taskId;
@@ -145,9 +146,10 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
                   tabAlignment: TabAlignment.start,
                   controller: tabController,
                   isScrollable: true,
-                  indicatorColor: Theme.of(context).colorScheme.secondary,
+                  indicatorColor: Colors.amber,
+                  indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: Theme.of(context).colorScheme.onPrimary,
-                  unselectedLabelColor: Colors.white,
+                  unselectedLabelColor: Colors.white60,
                   tabs: task.subTaskTitles
                       .map((title) => Tab(
                               child: Text(
@@ -214,9 +216,25 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
     if (subtasks.isEmpty) {
       return _buildEmptyState();
     }
-    return ListView(
-      children:
-          subtasks.map((subTask) => SubTaskWidget(subTask: subTask)).toList(),
+    return ListView.separated(
+      itemCount: subtasks.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 0.5.h,
+        color: const Color.fromARGB(187, 185, 184, 184),
+      ),
+      itemBuilder: (context, index) {
+        final subTask = subtasks[index];
+        return SubTaskWidget(
+          subTask: subTask,
+          onDelete: (task) {
+            context.read<SubTaskCubit>().deleteSubTask(task.id);
+          },
+          onComplete: (task) {
+            // context.read<SubTaskCubit>().updateSubTask(
+            //     task.copyWith(isCompleted: !task.isCompleted));
+          },
+        );
+      },
     );
   }
 
@@ -231,20 +249,6 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
               style: TextStyle(fontSize: 18, color: Colors.grey)),
         ],
       ),
-    );
-  }
-}
-
-class SubTaskWidget extends StatelessWidget {
-  final SubTask subTask;
-
-  const SubTaskWidget({super.key, required this.subTask});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(subTask.title),
-      subtitle: Text(subTask.description ?? ''),
     );
   }
 }
