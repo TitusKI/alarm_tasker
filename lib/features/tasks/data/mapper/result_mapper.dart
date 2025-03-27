@@ -1,3 +1,5 @@
+import 'package:alarm_tasker/features/tasks/data/models/subtask_model.dart';
+
 import '../models/task_w_subtask.dart';
 
 List<TaskWithSubTasks> mapResultToModel(List<Map<String, dynamic>> result) {
@@ -37,14 +39,20 @@ List<TaskWithSubTasks> mapResultToModel(List<Map<String, dynamic>> result) {
       // Handle SubTask
       final subTaskId = row['subTaskId'] as String?;
       if (subTaskId != null) {
-        final subTask = SubTask(
+        final subTask = SubTaskModel(
           id: subTaskId,
           title: row['subTaskName'] as String,
-          dueDate: row['dueDate'] as String?,
+          dueDate: row['dueDate'] != null
+              ? DateTime.tryParse(row['dueDate'] as String)
+              : null,
+          completedAt: row['completedAt'] != null
+              ? DateTime.tryParse(row['completedAt'])
+              : null,
           priority: row['priority'] as String?,
           imagePath: row['imagePath'] as String?,
           description: row['description'] as String?,
           isCompleted: (row['isCompleted'] as int) == 1,
+          subTaskTitleId: row['subTaskTitleId'] as String,
         );
 
         subTaskTitle.subtasks.add(subTask);
