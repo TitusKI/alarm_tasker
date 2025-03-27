@@ -27,12 +27,26 @@ class SubTaskLocalDataSource {
   }
 
   Future<void> updateSubTask(SubTaskModel subTask) async {
-    await database.update(
-      'subtasks',
-      subTask.toMap(),
-      where: 'id = ?',
-      whereArgs: [subTask.id],
-    );
+    print("Hello updateSubTask");
+    try {
+      print(
+          "Updating subtask with id: ${subTask.id} and isCompleted: ${subTask.isCompleted}");
+      final Map<String, dynamic> updatedFields = subTask.toMap();
+      print("updatedFields: $updatedFields");
+      if (updatedFields.isNotEmpty) {
+        await database.update(
+          'subtasks',
+          updatedFields,
+          where: 'id = ?',
+          whereArgs: [subTask.id],
+        );
+        print("Successfully updated subtask");
+      } else {
+        print("No fields to update for subtask");
+      }
+    } catch (e) {
+      print("Error updating subtask: $e");
+    }
   }
 
   Future<void> deleteSubTask(String subTaskId) async {
