@@ -40,6 +40,14 @@ Future<void> initializeDependencies() async {
   final database = await initializeDatabase();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // SystemChrome.setSystemUIOverlayStyle(
+  //   SystemUiOverlayStyle(
+  //     statusBarColor: Colors.red,
+  //     statusBarIconBrightness: Brightness.dark,
+  //     systemNavigationBarColor: Colors.transparent,
+  //     systemNavigationBarIconBrightness: Brightness.dark,
+  //   ),
+  // );
   if (kIsWeb) {
     await Hive.initFlutter();
   } else {
