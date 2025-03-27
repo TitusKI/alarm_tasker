@@ -21,7 +21,7 @@ class GenericState<T> {
       GenericState(isRefreshing: true, data: data);
 
   factory GenericState.success(T data) =>
-      GenericState(isSuccess: true, data: data);
+      GenericState(isSuccess: true, data: data, isLoading: false);
 
   factory GenericState.failure(String failure) =>
       GenericState(failure: failure);
