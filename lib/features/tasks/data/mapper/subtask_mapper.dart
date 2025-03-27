@@ -5,27 +5,28 @@ import '../models/subtask_model.dart';
 class SubTaskMapper {
   static SubTaskEntity toEntity(SubTaskModel model) {
     return SubTaskEntity(
-      id: model.id,
-      title: model.title,
-      dueDate: model.dueDate,
-      priority: model.priority,
-      imagePath: model.imagePath,
-      description: model.description,
-      isCompleted: model.isCompleted,
-      subTaskTitleId: model.subTaskTitleId,
-    );
+        id: model.id,
+        title: model.title,
+        dueDate: model.dueDate,
+        priority: model.priority,
+        imagePath: model.imagePath,
+        description: model.description,
+        isCompleted: model.isCompleted,
+        subTaskTitleId: model.subTaskTitleId,
+        completedAt: model.completedAt);
   }
 
   static SubTaskModel toModel(SubTaskEntity entity) {
+    print("SubTaskMapper completedAt: toModel: ${entity.completedAt}");
     return SubTaskModel(
-      id: entity.id,
-      title: entity.title,
-      dueDate: entity.dueDate,
-      priority: entity.priority,
-      imagePath: entity.imagePath,
-      description: entity.description,
-      isCompleted: entity.isCompleted,
-      subTaskTitleId: entity.subTaskTitleId,
-    );
+        id: entity.id,
+        title: entity.title,
+        dueDate: entity.dueDate,
+        priority: entity.priority,
+        imagePath: entity.imagePath,
+        description: entity.description,
+        isCompleted: entity.isCompleted,
+        subTaskTitleId: entity.subTaskTitleId,
+        completedAt: entity.completedAt);
   }
 }
