@@ -11,16 +11,17 @@ Future<TaskWithSubTasks> getTaskWithSubTasksById(String? taskId) async {
     SELECT 
       t.id AS taskId, t.title AS taskTitle,
       st.id AS subTaskTitleId, st.title AS subTaskTitle,
-      s.id AS subTaskId, s.title AS subTaskName, s.dueDate, s.priority, s.imagePath, s.description, s.isCompleted
+      s.id AS subTaskId, s.title AS subTaskName, s.dueDate, s.priority, s.imagePath, s.description, s.isCompleted, s.completedAt
     FROM tasks t
     LEFT JOIN subtask_titles st ON t.id = st.taskId
     LEFT JOIN subtasks s ON st.id = s.subTaskTitleId
     WHERE t.id = ?
     ORDER BY t.id, st.id, s.id
   ''', [taskId]);
-
+// print out all response
+  print("Data fetched from database ........");
   final tasksWithSubtasks = mapResultToModel(result);
-
+// print(tasksWithSubtasks.)
   return tasksWithSubtasks.isNotEmpty
       ? tasksWithSubtasks.first
       : TaskWithSubTasks(id: '', title: '', subTaskTitles: []);
