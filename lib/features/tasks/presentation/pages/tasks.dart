@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:alarm_tasker/core/resources/generic_state.dart';
 import 'package:alarm_tasker/features/tasks/domain/entities/sub_task.dart';
-import 'package:alarm_tasker/features/tasks/domain/entities/sub_task_title.dart';
 import 'package:alarm_tasker/features/tasks/presentation/cubit/tasks_w_subtask_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +10,14 @@ import '../../../../injection_container.dart';
 import 'package:logging/logging.dart';
 import '../../../theme/presentation/cubit/theme_cubit.dart';
 import '../../data/datasources/db_constant.dart';
+import '../../data/mapper/subtask_mapper.dart';
 import '../../data/models/task_w_subtask.dart';
-import '../cubit/subtask_titles_cubit.dart';
 import '../cubit/subtasks_cubit.dart';
 import '../widgets/build_quick_add_bar.dart';
 import '../widgets/drawer.dart';
 import '../widgets/sublist_dialog.dart';
 import '../widgets/subtask_widget.dart';
+import 'add_task.dart';
 
 class Tasks extends StatefulWidget {
   final String? taskId;
@@ -103,12 +105,33 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(),
-        drawer: drawer(context),
-        body: _buildBody(),
-        bottomSheet: tabController != null
-            ? QuickAddBar(tabController: tabController!)
-            : SizedBox());
+      drawer: drawer(context),
+      body: Column(
+        children: [
+          Expanded(child: _buildBody()),
+          if (tabController != null) QuickAddBar(tabController: tabController!)
+        ],
+      ),
+      // floatingActionButton: tabController != null
+      //     ? Padding(
+      //         padding:
+      //             EdgeInsets.only(bottom: 50.h), // Move the button upward
+      //         child: FloatingActionButton(
+      //           elevation: 10.h,
+      //           backgroundColor: Colors.amber,
+      //           shape: const CircleBorder(),
+      //           onPressed: () {
+      //             Navigator.of(context).push(MaterialPageRoute(
+      //                 builder: (context) => AddTaskScreen()));
+      //           },
+      //           child: const Icon(
+      //             Icons.add,
+      //             color: Colors.white,
+      //           ),
+      //         ),
+      //       )
+      // : null
+    );
   }
 
   AppBar _buildAppBar() {
@@ -118,7 +141,7 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
     return AppBar(
       title: Text(taskTitle.isEmpty ? "Tasks" : taskTitle,
           style: Theme.of(context).textTheme.headlineSmall),
-      bottom: _buildTabBar(),
+      // bottom: _buildTabBar(),
     );
   }
 
@@ -135,12 +158,11 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
     }
 
     return PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight),
-      child: Row(
-        children: [
-          Expanded(
-            child: BlocBuilder<SubTaskTitleCubit,
-                GenericState<List<SubTaskTitleEntity>>>(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Row(
+          children: [
+            Expanded(child:
+                BlocBuilder<TasksWSubtaskCubit, GenericState<TaskWithSubTasks>>(
               builder: (context, state) {
                 return TabBar(
                   tabAlignment: TabAlignment.start,
@@ -152,86 +174,182 @@ class _TasksState extends State<Tasks> with TickerProviderStateMixin {
                   unselectedLabelColor: Colors.white60,
                   tabs: task.subTaskTitles
                       .map((title) => Tab(
-                              child: Text(
-                            title.title,
-                            style: textTheme.bodyLarge,
+                              child: StreamBuilder<SubTaskEntity>(
+                            stream: context
+                                .read<SubTaskCubit>()
+                                .streamcontroler
+                                .expand((list) => list),
+                            builder: (context, snapshot) {
+                              final updatedTask = state.data ?? task;
+                              final updatedTitle = updatedTask.subTaskTitles
+                                  .firstWhere((t) => t.id == title.id,
+                                      orElse: () => title);
+                              return Text(
+                                "${updatedTitle.title.toUpperCase()}(${updatedTitle.subtasks.where((sub) => sub.isCompleted).length}/${updatedTitle.subtasks.length})",
+                                style: textTheme.bodyLarge,
+                              );
+                            },
                           )))
                       .toList(),
                 );
               },
+            )),
+            IconButton(
+              icon: Icon(Icons.add_circle, color: theme.textColor),
+              onPressed: () {
+                showSubListAddDialog(context);
+              },
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.add_circle, color: theme.textColor),
-            onPressed: () {
-              showSubListAddDialog(context);
-            },
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
   }
 
   Widget _buildBody() {
     final theme = context.read<ThemeCubit>().state;
     final task = context.watch<TasksWSubtaskCubit>().state.data;
 
-    if (task == null || task.subTaskTitles.isEmpty) {
-      return _buildEmptyState();
-    }
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        final taskTitle = context.select(
+            (TasksWSubtaskCubit cubit) => cubit.state.data?.title ?? 'Tasks');
 
-    return BlocBuilder<TasksWSubtaskCubit, GenericState<TaskWithSubTasks>>(
-      builder: (context, state) {
-        //  if (state.data == null || state.data!.subTaskTitles.isEmpty) {
-        //     return _buildEmptyState();
-        //   }
-
-        final TaskWithSubTasks updatedTask = state.data!;
-
-        return PageStorage(
-          bucket: _pageStorageBucket,
-          child: TabBarView(
-            controller: tabController,
-            children: updatedTask.subTaskTitles.map((title) {
-              return FutureBuilder<Widget>(
-                future: _buildSubTaskList(title.subtasks),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    return snapshot.data ?? const SizedBox();
-                  }
-                },
-              );
-            }).toList(),
-          ),
-        );
+        return [
+          // drawer(context),
+          SliverAppBar(
+            title: Text(
+              taskTitle.isEmpty ? "Tasks" : taskTitle,
+            ),
+            floating: true,
+            pinned: true,
+            snap: false,
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              background: Container(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            expandedHeight:
+                kToolbarHeight + (tabController != null ? kToolbarHeight : 0),
+            bottom: _buildTabBar(),
+          )
+        ];
       },
+      body: BlocBuilder<TasksWSubtaskCubit, GenericState<TaskWithSubTasks>>(
+        builder: (context, state) {
+          if (task == null || task.subTaskTitles.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          final TaskWithSubTasks updatedTask = state.data ?? task;
+
+          // TaskWithSubTasks.empty();
+
+          return PageStorage(
+            bucket: _pageStorageBucket,
+            child: Stack(
+              children: [
+                TabBarView(
+                  controller: tabController,
+                  children: updatedTask.subTaskTitles.map((title) {
+                    return FutureBuilder<Widget>(
+                      future: _buildSubTaskList(title.subtasks
+                          .map((e) => SubTaskMapper.toEntity(e))
+                          .toList()),
+                      builder: (context, snapshot) {
+                        {
+                          return snapshot.data ?? const SizedBox();
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+                tabController != null
+                    ? Positioned(
+                      right: 10.r,
+                      bottom: 10.h,
+                        child: FloatingActionButton(
+                          elevation: 10.h,
+                          backgroundColor: Colors.amber,
+                          shape: const CircleBorder(),
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => AddTaskScreen(
+                                    subTaskTitleId: updatedTask
+                                        .subTaskTitles[tabController!.index]
+                                        .id)));
+                          },
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Future<Widget> _buildSubTaskList(List<SubTask> subtasks) async {
-    if (subtasks.isEmpty) {
-      return _buildEmptyState();
-    }
+  Future<Widget> _buildSubTaskList(List<SubTaskEntity> subtasks) async {
+    // if (subtasks.isEmpty) {
+    //   return _buildEmptyState();
+    // }
+
     return ListView.separated(
+      padding: EdgeInsets.zero,
       itemCount: subtasks.length,
       separatorBuilder: (context, index) => Divider(
         height: 0.5.h,
         color: const Color.fromARGB(187, 185, 184, 184),
       ),
       itemBuilder: (context, index) {
-        final subTask = subtasks[index];
+        final SubTaskEntity subTask = subtasks[index];
         return SubTaskWidget(
           subTask: subTask,
-          onDelete: (task) {
-            context.read<SubTaskCubit>().deleteSubTask(task.id);
+          // Removed undefined parameter 'subTaskStream'
+          subTaskStreamController: StreamController<SubTaskEntity>.broadcast()
+            ..addStream(context
+                .read<SubTaskCubit>()
+                .streamcontroler
+                .asyncExpand((list) => Stream.fromIterable(list))),
+          onDelete: (SubTaskEntity? task) {
+            // if (task != null) {
+            //   context.read<SubTaskCubit>().deleteSubTask(task.id);
+            //   AsyncSnapshot.waiting();
+            //   context
+            //       .read<TasksWSubtaskCubit>()
+            //       .loadTasksWithSubTasks(id: constData.getTaskId());
+            // }
+            if (context.mounted) {
+              context.read<SubTaskCubit>().deleteSubTask(task!.id).then((_) => {
+                    context
+                        .read<TasksWSubtaskCubit>()
+                        .loadTasksWithSubTasks(id: constData.getTaskId())
+                        .asStream(),
+                  });
+            }
           },
           onComplete: (task) {
-            // context.read<SubTaskCubit>().updateSubTask(
-            //     task.copyWith(isCompleted: !task.isCompleted));
+            print("Completed At: ${task.completedAt}");
+            if (context.mounted) {
+              context
+                  .read<SubTaskCubit>()
+                  .updateSubTask(SubTaskEntity(
+                    id: task.id,
+                    subTaskTitleId: task.subTaskTitleId,
+                    isCompleted: task.isCompleted,
+                    completedAt: task.completedAt,
+                  ))
+                  .then((_) => {
+                        context
+                            .read<TasksWSubtaskCubit>()
+                            .loadTasksWithSubTasks(id: constData.getTaskId())
+                            .asStream(),
+                      });
+            }
           },
         );
       },
