@@ -20,7 +20,7 @@ Future<Database> initializeDatabase() async {
   // Open the database
   return openDatabase(
     path,
-    version: 2,
+    version: 5,
     onCreate: (db, version) async {
       // Create your tables here
       await db.execute('''
@@ -40,12 +40,13 @@ Future<Database> initializeDatabase() async {
       await db.execute('''
         CREATE TABLE subtasks (
           id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
+          title TEXT NULL,
           dueDate TEXT ,
           priority TEXT ,
           imagePath TEXT,
           description TEXT,
           isCompleted INTEGER NOT NULL,
+          completedAt TEXT,
           subTaskTitleId TEXT NOT NULL,
           FOREIGN KEY (subTaskTitleId) REFERENCES subtask_titles (id) ON DELETE CASCADE
         )
