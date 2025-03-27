@@ -11,8 +11,10 @@ class TasksWSubtaskCubit extends Cubit<GenericState<TaskWithSubTasks>> {
     emit(GenericState.loading());
     try {
       final tasks = await getTaskWithSubTasksById(id);
+      print("Successfully fetched all da");
       emit(GenericState.success(tasks));
     } catch (e) {
+      print("Error catched: $e");
       emit(GenericState.failure(e.toString()));
     }
   }
