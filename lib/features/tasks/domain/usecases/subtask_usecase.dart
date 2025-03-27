@@ -21,7 +21,9 @@ class DeleteSubTaskUsecase implements Usecase<void, String> {
 class UpdateSubTaskUsecase implements Usecase<void, SubTaskEntity> {
   @override
   Future<void> call({SubTaskEntity? params}) {
-    return sl<SubTaskRepository>().updateSubTask(params!);
+    print(
+        "Updating subtask... ${params!.id} isCompleted: ${params.isCompleted}");
+    return sl<SubTaskRepository>().updateSubTask(params);
   }
 }
 
