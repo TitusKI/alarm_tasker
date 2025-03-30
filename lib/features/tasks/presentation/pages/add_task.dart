@@ -1,3 +1,4 @@
+import 'package:alarm_tasker/features/tasks/data/datasources/alarm_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,9 +7,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../injection_container.dart';
 import '../../../theme/data/datasources/theme_local_data_source.dart';
 import '../../data/datasources/db_constant.dart';
+import '../../data/datasources/notification_services.dart';
 import '../../domain/entities/sub_task.dart';
 import '../cubit/subtasks_cubit.dart';
 import '../cubit/tasks_w_subtask_cubit.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class AddTaskScreen extends StatefulWidget {
   final String subTaskTitleId;
@@ -27,6 +30,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final constData = sl<ConstantLocalDataSource>();
   final theme = sl<ThemeLocalDataSource>();
   DateTime? _selectedDateTime;
+  final bool _isAlarmEnabled = false;
 
   @override
   void initState() {
@@ -49,9 +53,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
 
     if (pickedDate != null) {
+      // Show Time Picker in 12-hour format
       TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child!,
+          );
+        },
       );
 
       if (pickedTime != null) {
@@ -61,7 +72,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             pickedDate.month,
             pickedDate.day,
             pickedTime.hour,
-            pickedTime.minute,
+            pickedTime.period.index,
           );
         });
       }
@@ -94,8 +105,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     },
                     child: TextField(
                       controller: _subTaskController,
-                      autofocus:
-                          true, // Automatically focuses on this TextField
+                      // autofocus: true,
                       onChanged: (val) => setState(() => taskName = val),
                       decoration: InputDecoration(
                         fillColor: Colors.amber,
@@ -178,6 +188,21 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             .loadTasksWithSubTasks(id: constData.getTaskId())
                             .asStream(),
                       });
+              // Schedule notification
+              sl<NotificationService>().scheduleNotification(
+                id: subTaskId.hashCode, // Unique ID for each task
+                title: 'Task Reminder',
+                body: 'Reminder for "${_subTaskController.text}"',
+                dateTime: tz.TZDateTime.from(_selectedDateTime!, tz.local),
+              );
+
+              // If user enables alarm, schedule alarm sound
+              if (_isAlarmEnabled) {
+                Future.delayed(
+                  _selectedDateTime!.difference(DateTime.now()),
+                  () => sl<AlarmServices>().playAlarmSound(),
+                );
+              }
               context.pop();
             },
             child: Icon(Icons.check, color: Colors.white),
@@ -239,7 +264,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return ListTile(
       title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: _selectedDateTime != null
-          ? Text("${_selectedDateTime!.toLocal()}".split(".")[0])
+          ? Text(
+              "${_selectedDateTime!.day}/${_selectedDateTime!.month}/${_selectedDateTime!.year} ${_selectedDateTime!.hour > 12 ? _selectedDateTime!.hour - 12 : _selectedDateTime!.hour}:${_selectedDateTime!.minute.toString().padLeft(2, '0')} ${_selectedDateTime!.hour >= 12 ? 'PM' : 'AM'}",
+            )
           : Text(value),
       trailing: Icon(Icons.calendar_today),
       onTap: _pickDateTime,
