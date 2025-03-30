@@ -1,13 +1,9 @@
 import 'package:alarm_tasker/features/tasks/domain/entities/sub_task_title.dart';
 import 'package:alarm_tasker/features/tasks/domain/entities/task.dart';
 import 'package:alarm_tasker/features/theme/presentation/cubit/theme_cubit.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../../../core/resources/generic_state.dart';
 import '../cubit/subtask_titles_cubit.dart';
 import '../cubit/tasks_cubit.dart';
 import '../pages/tasks.dart';
