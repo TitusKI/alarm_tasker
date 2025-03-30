@@ -1,5 +1,8 @@
 import 'package:alarm_tasker/core/util/adapters/color_adapter.dart';
+import 'package:alarm_tasker/features/tasks/data/datasources/alarm_services.dart'
+    show AlarmServices;
 import 'package:alarm_tasker/features/tasks/data/datasources/db_constant.dart';
+import 'package:alarm_tasker/features/tasks/data/datasources/notification_services.dart';
 import 'package:alarm_tasker/features/tasks/domain/repositories/subtask_repository.dart';
 import 'package:alarm_tasker/features/tasks/domain/repositories/task_repository.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +70,8 @@ Future<void> initializeDependencies() async {
       () => ConstantLocalDataSourceImpl(constBox));
   sl.registerLazySingleton(() => TaskLocalDataSource(database));
   sl.registerLazySingleton(() => SubTaskLocalDataSource(database));
+  sl.registerLazySingleton<NotificationService>(() => NotificationService());
+  sl.registerLazySingleton<AlarmServices>(() => AlarmServices());
 
   sl.registerLazySingleton(() => SubTaskTitlesDataSource(database));
 
@@ -102,4 +107,6 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => SubTaskCubit());
   sl.registerFactory(() => SubTaskTitleCubit());
   sl.registerFactory(() => TasksWSubtaskCubit());
+
+  await sl<NotificationService>().init();
 }
