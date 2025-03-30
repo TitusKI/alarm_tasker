@@ -63,7 +63,7 @@ class _SubListAddDialogState extends State<SubListAddDialog> {
               ),
             ),
             Container(
-              color: Colors.white,
+              // color: Colors.white,
               child: Column(
                 children: [
                   Padding(
