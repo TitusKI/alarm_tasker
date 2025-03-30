@@ -96,9 +96,9 @@ class SubTaskWidget extends StatelessWidget {
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               if (subTask.dueDate != null)
+                              if (subTask.dueDate != null)
                                 Text(
-                                  "${subTask.dueDate!.day}/${subTask.dueDate!.month}/${subTask.dueDate!.year}",
+                                  "${subTask.dueDate!.day}/${subTask.dueDate!.month}/${subTask.dueDate!.year} ${subTask.dueDate!.hour > 12 ? subTask.dueDate!.hour - 12 : subTask.dueDate!.hour}:${subTask.dueDate!.minute.toString().padLeft(2, '0')} ${subTask.dueDate!.hour >= 12 ? 'PM' : 'AM'}",
                                   style: const TextStyle(
                                       color: Colors.red, fontSize: 12),
                                 ),
@@ -106,7 +106,6 @@ class SubTaskWidget extends StatelessWidget {
                                 Text("${subTask.description}",
                                     style:
                                         Theme.of(context).textTheme.labelSmall),
-                             
                               if (subTask.priority != null)
                                 Container(
                                   margin: const EdgeInsets.only(top: 4),
