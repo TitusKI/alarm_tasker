@@ -13,7 +13,7 @@ class ThemeCubit extends Cubit<ThemeState> {
           ThemeState(
               primaryColor:
                   sl<GetThemeUsecase>().getPrimaryColor() ?? Colors.blue,
-              isDarkMode: sl<GetThemeUsecase>().getThemeMode() ?? false,
+              isDarkMode: true ?? false,
               textColor: sl<GetThemeUsecase>().getTextColor() ?? Colors.white),
         );
 
